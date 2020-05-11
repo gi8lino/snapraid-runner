@@ -1,0 +1,32 @@
+2020-04-01 15:08:19,388 [INFO   ] start arguments: ['/app/snapraid_runner/snapraid_runner.py', '-c', '/config/snapraid_runner.conf', '--no-deletethreshold', '--no-updatethreshold', '--no-touch', '--no-scrub', '--no-smart', '--force-mail', '--force-attachment', '--force-message', '--log-config']
+2020-04-01 15:08:19,389 [INFO   ] loaded config: {"snapraid": {"executable": "/app/snapraid/snapraid", "config": "/etc/snapraid.conf", "verbose": null}, "snapraid.thresholds": {"delete": -1, "update": -1, "copy": -1, "move": -1, "restore": -1}, "snapraid.touch": {"enabled": false}, "snapraid.scrub": {"enabled": false, "percentage": 22, "older-than": 12}, "snapraid.smart": {"enabled": false, "executable": "/usr/sbin/smartctl"}, "logging.console": {"enabled": true, "json": false}, "logging.file": {"enabled": true, "path": "/tmp/logs/snapraid/snapraid.log", "json": false, "maxsize": 0, "backups": 5, "compress": true}, "email": {"enabled": true, "sendon": "success,error", "from": "*********@gmail.com", "to": "******@gmail.com", "subject": "[SnapRAID] Status Report: {STATE}", "short": false, "maxsize": 0, "force": true}, "email.smtp": {"host": "smtp.gmail.com", "port": 465, "encryption": "ssl", "user": "*********@gmail.com", "password": "**********", "ssl": true, "tls": false}, "slack.message": {"enabled": false, "webhook_url": "https://hooks.slack.com/services/**********", "sendon": "success,error", "text": "snapraid-runner: {STATE}", "force": true}, "slack.attachment": {"enabled": true, "sendon": "success,error", "token": "**********", "channels": "*****", "title": "snapraid-runner: {STATE}", "short": false, "force": true}, "docker": {"enabled": true, "endpoint": "unix:///var/run/docker.sock", "containers": [{"name": "sabnzbd", "paused": false}, {"name": "sickchill", "paused": false}, {"name": "sonarr", "paused": false}, {"name": "radarr", "paused": false}], "force_resume": false}}
+2020-04-01 15:08:19,389 [INFO   ] ==================================================
+2020-04-01 15:08:19,389 [INFO   ] Run started
+2020-04-01 15:08:19,389 [INFO   ] ==================================================
+2020-04-01 15:08:19,495 [INFO   ] Pause containers...
+2020-04-01 15:08:19,520 [INFO   ] Pause container 'sabnzbd'
+2020-04-01 15:08:19,542 [INFO   ] Pause container 'sickchill'
+2020-04-01 15:08:19,565 [INFO   ] Pause container 'sonarr'
+2020-04-01 15:08:19,591 [INFO   ] Pause container 'radarr'
+2020-04-01 15:08:19,591 [INFO   ] **************************************************
+2020-04-01 15:08:19,591 [INFO   ] Running diff...
+2020-04-01 15:08:19,594 [OUTPUT ] Loading state from /config/.snapraid.content...
+2020-04-01 15:08:25,307 [OUTPUT ] Comparing...
+2020-04-01 15:08:25,494 [OUTPUT ] No differences
+2020-04-01 15:08:29,518 [INFO   ] Diff results: 0 equal, 0 added, 0 removed, 0 updated, 0 moved, 0 copied, 0 restored
+2020-04-01 15:08:29,518 [INFO   ] **************************************************
+2020-04-01 15:08:29,519 [INFO   ] No changes detected, no sync required
+2020-04-01 15:08:29,519 [INFO   ] All done
+2020-04-01 15:08:29,520 [INFO   ] **************************************************
+2020-04-01 15:08:29,520 [INFO   ] Resume containers...
+2020-04-01 15:08:29,604 [INFO   ] Resume container 'sabnzbd'
+2020-04-01 15:08:29,639 [INFO   ] Resume container 'sickchill'
+2020-04-01 15:08:29,671 [INFO   ] Resume container 'sonarr'
+2020-04-01 15:08:29,700 [INFO   ] Resume container 'radarr'
+2020-04-01 15:08:29,700 [INFO   ] **************************************************
+2020-04-01 15:08:29,700 [INFO   ] Send notifications...
+2020-04-01 15:08:30,928 [INFO   ] successfully send eMail
+2020-04-01 15:08:31,136 [INFO   ] successfully send Slack message
+2020-04-01 15:08:31,400 [INFO   ] successfully send Slack attachment
+2020-04-01 15:08:31,400 [INFO   ] **************************************************
+2020-04-01 15:08:31,400 [INFO   ] Run finished successfully

@@ -1,0 +1,106 @@
+[snapraid]
+; path to the snapraid executable (e.g. /bin/snapraid)
+executable = /bin/snapraid
+; path to the snapraid config to be used
+config = /etc/snapraid.conf
+; set snapraid output to verbose
+verbose = true
+
+[snapraid.thresholds]
+; abort operation if there are more adds than this, set to -1 to disable
+add = -1
+; abort operation if there are more removes than this, set to -1 to disable
+remove = 40
+; abort operation if there are more updates than this, set to -1 to disable
+update = 400
+; abort operation if there are more copies than this, set to -1 to disable
+copy = -1
+; abort operation if there are more moves than this, set to -1 to disable
+move = -1
+; abort operation if there are more restores than this, set to -1 to disable
+restore = -1
+
+[snapraid.touch]
+; set to true to run touch before sync
+enabled = false
+
+[snapraid.scrub]
+; set to true to run scrub after sync
+enabled = false
+percentage = 12
+older-than = 10
+
+[snapraid.smart]
+; set to true to run smart after scrub
+; if enabled, the smart output will always be send with mail.
+enabled = false
+executable = /usr/sbin/smartctl
+
+[logging.console]
+enabled = true
+; format output as json
+json = false
+
+[logging.file]
+enabled = true
+; logfile to write to, leave empty to disable
+path = snapraid.log
+; format output as json
+json = true
+; maximum logfile size in KiB, leave empty for infinite
+maxsize = 4882.813
+; amount of backups to keep if maxsize is reached
+backups = 5
+; if either of maxsize or backup is zero, rollover never occurs
+; compress backups (gzip)
+compress = true
+
+[email]
+enabled = true
+; when to send an email, comma-separated list of [success, error]
+sendon = success,error
+from =
+to =
+; {STATE} will be replaced with SUCCESS or ERROR
+; {RUNTIME} will be replaced with script runtime ("1 minute, 19 seconds")
+subject = [SnapRAID] Status Report: {STATE}
+; set to false to send full snapraid output
+short = false
+; maximum email size in KiB, leave empty for all output
+maxsize = 5000
+
+[email.smtp]
+host = smtp.gmail.com
+; leave empty for default port
+port = 465
+; set to "tls", "ssl" or leave empty for no encryption
+encryption = ssl
+user =
+password =
+
+[slack.message]
+enabled = true
+webhook_url = https://hooks.slack.com/services/<TOKEN>
+; when to send a slack message, comma-separated list of [success, error]
+sendon = success,error
+; {STATE} will be replaced with SUCCESS or ERROR
+; {RUNTIME} will be replaced with script runtime ("1 minute, 19 seconds")
+text = snapraid-runner: {STATE}
+
+[slack.attachment]
+enabled = true
+; when to send the snapRAID output as attachment, comma-separated list of [success, error]
+sendon = success,error
+token = 
+channels = 
+; {STATE} will be replaced with SUCCESS or ERROR
+; {RUNTIME} will be replaced with script runtime ("1 minute, 19 seconds")
+title = snapraid-runner finished in {RUNTIME}
+; set to false to send full snapraid output
+short = false
+
+[docker]
+enabled = false
+containers = sabnzbd, medusa
+; resume also container which are not paused by this script
+force_resume = true
