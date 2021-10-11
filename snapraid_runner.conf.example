@@ -98,9 +98,3 @@ channels =
 title = snapraid-runner finished in {RUNTIME}
 ; set to false to send full snapraid output
 short = false
-
-[docker]
-enabled = false
-containers = sabnzbd, medusa
-; resume also container which are not paused by this script
-force_resume = true

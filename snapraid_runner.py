@@ -21,7 +21,6 @@ from io import StringIO
 
 try:
     import requests
-    import docker
 except ImportError:
     sys.stderr.write(f"{traceback.format_exc()}\n")
     raise ImportError(
@@ -64,9 +63,6 @@ It runs 'diff' before 'sync' to see how many files were deleted, updated,
 copied, moved or restored and aborts if that number exceeds the set threshold.
 It can run 'touch' before and 'scrub' after 'sync'.
 If configured, it also runs 'smart'.
-It can pause and resume Docker containers before starting/ending
-SnapRAID commands. It only resumes containers that have been paused by this
-Script itself. Already paused containers are not resumed.
 All this is configurable in the config file or by overriding with
 start arguments.""",
         epilog="""
@@ -241,30 +237,6 @@ inspired by https://github.com/Chronial/snapraid-runner
                                     dest="short_attachment",
                                     help="send full SnapRAID output "
                                          "as Slack attachment")
-    group_pause = group.add_mutually_exclusive_group(required=False)
-    group_pause.add_argument("--pause",
-                             action="store_true",
-                             default=None,
-                             dest="pause",
-                             help="stop/resume Docker containers")
-    group_pause.add_argument("--no-pause",
-                             action="store_false",
-                             default=None,
-                             dest="pause",
-                             help="do not stop/resume Docker containers")
-    group_resume = group.add_mutually_exclusive_group(required=False)
-    group_resume.add_argument("--soft-resume",
-                              action="store_false",
-                              default=None,
-                              dest="force_resume",
-                              help="resume containers only if they were "
-                                   "paused by this Script")
-    group_resume.add_argument("--hard-resume",
-                              action="store_true",
-                              default=None,
-                              dest="force_resume",
-                              help="resume containers even if they were not "
-                                   "paused by this Script")
 
     args, unknown = parser.parse_known_args()
     if unknown:
@@ -287,8 +259,7 @@ def load_config(args):
                 "snapraid.smart",
                 "logging.console", "logging.file",
                 "email", "email.smtp",
-                "slack.message", "slack.attachment",
-                "docker"]
+                "slack.message", "slack.attachment"]
     config = {section: defaultdict(lambda: "") for section in sections}
     for section in parser.sections():
         for (k, v) in parser.items(section):
@@ -300,7 +271,7 @@ def load_config(args):
 
     config['snapraid.thresholds']['add'] = (
         -1 if args.disable_add_threshold or
-           not config['snapraid.thresholds'].get('add') 
+           not config['snapraid.thresholds'].get('add')
            else (
             int(config['snapraid.thresholds']['add']) if
             config['snapraid.thresholds']['add'].lstrip("-").isdigit() else
@@ -403,17 +374,6 @@ def load_config(args):
         args.short_attachment if args.short_attachment is not None else
         config['slack.attachment']['short'].lower() == "true")
 
-    config['docker']['enabled'] = (
-        args.pause if args.pause else
-        config['docker']['enabled'].lower() == "true")
-    config['docker']['containers'] = (
-        [{"name": containers.strip(), "paused": False} for containers in
-         config['docker']['containers'].split(",")] if
-         config['docker'].get('containers') else None)
-    config['docker']['force_resume'] = (
-        args.force_resume if args.force_resume is not None else
-        config['docker']['force_resume'].lower() == "true")
-
 
 def setup_logger():
     """setup console, file, email and/or slack logger"""
@@ -424,7 +384,6 @@ def setup_logger():
         os.remove(source)
 
     logging.getLogger("urllib3").setLevel(logging.WARNING)
-    logging.getLogger("docker").setLevel(logging.WARNING)
 
     json_format = logging.Formatter(
         '{"time": "%(asctime)s",'
@@ -534,17 +493,6 @@ def runner():
     if not os.path.isfile(config['snapraid']['config']):
         raise FileNotFoundError("The configured SnapRAID config does not "
                                 f"exist at '{config['snapraid']['config']}'")
-
-    if config['docker']['enabled']:
-        try:
-            config['docker']['client'] = docker.from_env()
-        except Exception as e:
-            raise Exception(f"Cannot connect to Docker. {e}")
-
-        logging.info("Pause container%s...",
-                     "s" if len(config['docker']['containers']) != 1 else "")
-        pause_containers()
-        logging.info("*" * 50)
 
     if config['snapraid.touch']['enabled']:
         logging.info("Running touch...")
@@ -737,56 +685,6 @@ def _tee_log(std, out_lines, log_level):
     return t
 
 
-def pause_containers():
-    """pause docker container"""
-    for container in config['docker']['containers']:
-        try:
-            container_details = (
-                config['docker']['client'].inspect_container(
-                    container['name']))
-        except Exception as e:
-            logging.warning(logging.warning(str(e)))
-            continue
-
-        if not container_details['State']['Running']:
-            logging.warning("container '%s' is not running", container['name'])
-            continue
-        if container_details['State']['Paused']:
-            logging.warning("container '%s' is already paused",
-                            container['name'])
-            container['paused'] = True
-            continue
-
-        try:
-            config['docker']['client'].pause(container['name'])
-            container['paused'] = True
-            logging.info("pause container '%s'", container['name'])
-        except Exception as e:
-            raise Exception("cannot pause container "
-                            f"'{container['name']}'! {str(e)}")
-
-
-def resume_containers():
-    """resume docker container"""
-    for container in config['docker']['containers']:
-        try:
-            container_details = (
-                config['docker']['client'].inspect_container(
-                    container['name']))
-        except Exception as e:
-            logging.warning(str(e))
-            continue
-        if ((container['paused'] or config['docker']['force_resume']) and
-           container_details['State']['Running'] and
-           container_details['State']['Paused']):
-                try:
-                    config['docker']['client'].unpause(container['name'])
-                    logging.info("resume container '%s'", container['name'])
-                except Exception as e:
-                    logging.error("cannot resume container '%s'! %s",
-                                  container['name'], str(e))
-
-
 def finish(is_success):
     """write summary and send mail and/or slack notification
 
@@ -808,12 +706,6 @@ def finish(is_success):
         return (', '.join(
             f"{value} {name}{'s' if value != 1 else ''}" for name, value in
             periods if value))
-
-    if config['docker']['containers'] and config['docker']['client']:
-        logging.info("Resume container%s...",
-                     "s" if len(config['docker']['containers']) != 1 else "")
-        resume_containers()
-        logging.info("*" * 50)
 
     time_string = calculate_runtime(config['snapraid']['start'])
 

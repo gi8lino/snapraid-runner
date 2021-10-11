@@ -2,7 +2,6 @@
 
 This Script runs SnapRAID and sends it output to the console, a log file, via eMail and/or Slack. It runs `diff` before `sync` to see how many files were deleted, updated, copied, moved or restored and aborts if that number exceeds the set threshold. It can run `touch` before and `scrub` after `sync`.  
 If configured, it also runs `smart`.  
-It can pause and resume Docker containers before starting/ending SnapRAID commands. It only resumes containers that have been paused by this Script itself. Already paused containers are not resumed.  
 All this is configurable in the config file or by overriding with start arguments.
 
 ## Usage
@@ -19,8 +18,6 @@ snapraid_runner.py [-h] [-v] [--log-config] [-c PATH]
                    [--message | --no-message | --force-message]
                    [--attachment | --no-attachment | --force-attachment]
                    [--short-attachment | --long-attachment]
-                   [--pause | --no-pause]
-                   [--soft-resume | --hard-resume]
 ```
 
 ## optional arguments
@@ -63,10 +60,6 @@ snapraid_runner.py [-h] [-v] [--log-config] [-c PATH]
 | --force-attachment    | ignore 'sendon' and send always a Slack attachment            |
 | --short-attachment    | do not send full SnapRAID output as Slack attachment          |
 | --long-attachment     | send full SnapRAID output as Slack attachment                 |
-| --pause               | stop/resume Docker containers                                 |
-| --no-pause            | do not stop/resume Docker containers                          |
-| --soft-resume         | resume containers only if they were paused by this Script     |
-| --hard-resume         | resume containers even if they were not paused by this Script |
 
 created by [gi8lino](https://github.com/gi8lino/snapraid-runner)  
 inspired by [snapraid-runner](https://github.com/Chronial/snapraid-runner)
