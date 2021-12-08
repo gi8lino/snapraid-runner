@@ -27,7 +27,7 @@ enabled = false
 [snapraid.scrub]
 ; set to true to run scrub after sync
 enabled = false
-percentage = 12
+plan = 12
 older-than = 10
 
 [snapraid.smart]

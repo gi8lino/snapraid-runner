@@ -310,9 +310,9 @@ def load_config(args):
     config['snapraid.scrub']['enabled'] = (
         args.scrub if args.scrub is not None else
         config['snapraid.scrub']['enabled'].lower() == "true")
-    config['snapraid.scrub']['percentage'] = (
-        int(config['snapraid.scrub']['percentage']) if
-        config['snapraid.scrub']['percentage'].isdigit() else 0)
+    config['snapraid.scrub']['plan'] = (
+        int(config['snapraid.scrub']['plan']) if
+        config['snapraid.scrub']['plan'].isdigit() else 0)
     config['snapraid.scrub']['older-than'] = (
         int(config['snapraid.scrub']['older-than']) if
         config['snapraid.scrub']['older-than'].isdigit() else 0)
@@ -575,10 +575,10 @@ def runner():
 
     if config['snapraid.scrub']['enabled']:
         logging.info("Running scrub (%s%s, %s days)...",
-                     config['snapraid.scrub']['percentage'], "%",
+                     config['snapraid.scrub']['plan'], "%",
                      config['snapraid.scrub']['older-than'])
         snapraid_command(command="scrub", args={
-            "percentage": config['snapraid.scrub']['percentage'],
+            "plan": config['snapraid.scrub']['plan'],
             "older-than": config['snapraid.scrub']['older-than'],
         })
         logging.info("*" * 50)

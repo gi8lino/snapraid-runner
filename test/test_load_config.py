@@ -64,7 +64,7 @@ class TestSum(unittest.TestCase):
             ('snapraid.thresholds', 'copy'),
             ('snapraid.thresholds', 'move'),
             ('snapraid.thresholds', 'restore'),
-            ('snapraid.scrub', 'percentage'),
+            ('snapraid.scrub', 'plan'),
             ('snapraid.scrub', 'older-than'),
             #('logging.file', 'maxsize'),
             ('logging.file', 'backups'),
