@@ -1,3 +1,7 @@
+⚠️ **Deprecation Notice**
+
+This project is no longer maintained and will not receive updates. Please migrate to [go-snapraid](https://github.com/gi8lino/snapraid-runner) instead!
+
 # snapraid-runner
 
 This Script runs SnapRAID and sends it output to the console, a log file, via eMail and/or Slack. It runs `diff` before `sync` to see how many files were deleted, updated, copied, moved or restored and aborts if that number exceeds the set threshold. It can run `touch` before and `scrub` after `sync`.  
