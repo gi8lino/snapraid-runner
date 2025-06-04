@@ -1,6 +1,6 @@
 ⚠️ **Deprecation Notice**
 
-This project is no longer maintained and will not receive updates. Please migrate to [go-snapraid](https://github.com/gi8lino/snapraid-runner) instead!
+This project is no longer maintained and will not receive updates. Please migrate to [go-snapraid](https://github.com/gi8lino/go-snapraid) instead!
 
 # snapraid-runner
 
